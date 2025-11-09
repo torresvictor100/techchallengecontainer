@@ -1,0 +1,32 @@
+# Pastas de build
+build/
+.gradle/
+
+# Configuração de IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VSCode
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# Arquivos temporários
+*.tmp
+*.swp
+*.swo
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos que não precisam ir pra imagem
+README.md
+LICENSE
