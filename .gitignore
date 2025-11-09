@@ -1,0 +1,45 @@
+### Build ###
+build/
+out/
+target/
+.gradle/
+**/build/
+
+### IDEs ###
+.idea/
+*.iml
+*.ipr
+*.iws
+
+.vscode/
+
+### Logs ###
+*.log
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Env Files ###
+.env
+.env.local
+*.env
+
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+### Backup ###
+*~
+
+### Docker ###
+/usr/
+docker-data/
+docker-compose.override.yml
+
+### Others ###
+*.tmp
+*.swp
+*.swo
