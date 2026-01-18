@@ -40,8 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
                                 "/swagger-resources/**","/webjars/**").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios/registrar").permitAll()
+                        .requestMatchers("/v1/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/api/usuarios/registrar").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);

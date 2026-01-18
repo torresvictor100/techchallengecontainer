@@ -1,0 +1,769 @@
+{
+  "info": {
+    "_postman_id": "c3f6a970-1111-4444-8888-9d2f00000001",
+    "name": "TechChallenge",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection com senhas em SHA-256 para login/cadastro/troca de senha + endpoints: buscar por nome, trocar role e deletar usuário (sucesso e falhas)."
+  },
+  "item": [
+    {
+      "name": "01 - Auth",
+      "item": [
+        {
+          "name": "Login - Válido (gera token) [HASH]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "pm.test('Token existe', function () {",
+                  "  pm.expect(json.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('accessToken', json.token);",
+                  "",
+                  "if (json.refreshToken) {",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{loginPasswordHash}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Inválido (senha errada) -> 401 [HASH]",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let CryptoJS;",
+                  "try { CryptoJS = require('crypto-js'); } catch (e) { CryptoJS = global.CryptoJS; }",
+                  "",
+                  "const wrongPlain = 'senhaErrada123';",
+                  "const wrongHash = CryptoJS.SHA256(wrongPlain).toString(CryptoJS.enc.Hex);",
+                  "pm.collectionVariables.set('wrongLoginPasswordHash', wrongHash);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{wrongLoginPasswordHash}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Me - Dados do usuário autenticado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "pm.test('Email existe', function () {",
+                  "  pm.expect(json.email).to.be.a('string');",
+                  "});",
+                  "",
+                  "if (json.idUser) pm.collectionVariables.set('userId', json.idUser);",
+                  "if (json.email) pm.collectionVariables.set('userEmail', json.email);",
+                  "if (json.nome) pm.collectionVariables.set('userNome', json.nome);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "auth", "me"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Usuários",
+      "item": [
+        {
+          "name": "Cadastro - Válido (registrar usuário) [HASH]",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('novoEmail', `user_${Date.now()}@tech.com`);",
+                  "pm.collectionVariables.set('novoNome', `Usuario ${Date.now()}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "pm.test('Retornou ID', function () {",
+                  "  pm.expect(json.id).to.exist;",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('createdUserId', json.id);",
+                  "pm.collectionVariables.set('createdUserEmail', json.email);",
+                  "pm.collectionVariables.set('createdUserNome', json.nome);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{novoNome}}\",\n  \"email\": \"{{novoEmail}}\",\n  \"senha\": \"{{novoUserSenhaHash}}\",\n  \"endereco\": \"Rua Centro, 123 - Recife, PE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/registrar",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "registrar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastro - Inválido (email duplicado) [HASH]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 ou 409 (depende da sua regra)', function () {",
+                  "  pm.expect([400,409]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Duplicado\",\n  \"email\": \"{{createdUserEmail}}\",\n  \"senha\": \"{{novoUserSenhaHash}}\",\n  \"endereco\": \"Rua Duplicada, 000\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/registrar",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "registrar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastro - Inválido (campos obrigatórios faltando)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"email\": \"\",\n  \"senha\": \"\",\n  \"endereco\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/registrar",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "registrar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Usuário - Sucesso (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "pm.test('Nome atualizado', function () {",
+                  "  pm.expect(json.nome).to.contain('Atualizado');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{createdUserNome}} Atualizado\",\n  \"email\": \"{{createdUserEmail}}\",\n  \"endereco\": \"Av. Atualizada, 999\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Usuário - Erro (PUT com dados inválidos)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.expect([400]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"email\": \"email_invalido\",\n  \"endereco\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+            }
+          },
+          "response": []
+        },
+
+        {
+          "name": "Alterar Senha - Sucesso (PATCH /{id}/senha) [HASH]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 ou 204', function () {",
+                  "  pm.expect([200,204]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"senhaAtual\": \"{{senhaAtualHash}}\",\n  \"novaSenha\": \"{{novaSenhaHash}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}/senha",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{createdUserId}}", "senha"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alterar Senha - Erro (senha atual errada) [HASH]",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let CryptoJS;",
+                  "try { CryptoJS = require('crypto-js'); } catch (e) { CryptoJS = global.CryptoJS; }",
+                  "const wrongPlain = 'SenhaErrada999';",
+                  "pm.collectionVariables.set('wrongSenhaAtualHash', CryptoJS.SHA256(wrongPlain).toString(CryptoJS.enc.Hex));",
+                  "const wrongNewPlain = 'OutraSenha@123';",
+                  "pm.collectionVariables.set('wrongNovaSenhaHash', CryptoJS.SHA256(wrongNewPlain).toString(CryptoJS.enc.Hex));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 ou 401 (depende da sua regra)', function () {",
+                  "  pm.expect([400,401]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"senhaAtual\": \"{{wrongSenhaAtualHash}}\",\n  \"novaSenha\": \"{{wrongNovaSenhaHash}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}/senha",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{createdUserId}}", "senha"]
+            }
+          },
+          "response": []
+        },
+
+        {
+          "name": "Buscar Usuário por ID (GET /{id})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "let json = pm.response.json();",
+                  "pm.test('Retornou email', function () {",
+                  "  pm.expect(json.email).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+            }
+          },
+          "response": []
+        },
+
+        {
+          "name": "Buscar Usuários por Nome - Sucesso (GET /buscar?nome=...) [ADMIN]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "pm.test('Retornou lista', function () {",
+                  "  pm.expect(json).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/buscar?nome={{createdUserNome}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "buscar"],
+              "query": [{ "key": "nome", "value": "{{createdUserNome}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Usuários por Nome - Falha (nome vazio) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/buscar?nome=",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "buscar"],
+              "query": [{ "key": "nome", "value": "" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Usuários por Nome - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/buscar?nome={{createdUserNome}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "buscar"],
+              "query": [{ "key": "nome", "value": "{{createdUserNome}}" }]
+            }
+          },
+          "response": []
+        },
+
+        {
+          "name": "Atualizar Role - Sucesso (PATCH /role) [ADMIN]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "pm.test('Role atualizada', function () {",
+                  "  pm.expect(json).to.have.property('role');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUser\": \"{{createdUserId}}\",\n  \"role\": \"DONO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "role"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Role - Falha (role inválida) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUser\": \"{{createdUserId}}\",\n  \"role\": \"ROLE_INVENTADA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "role"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Role - Falha (usuário não existe) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUser\": \"{{nonexistentUserId}}\",\n  \"role\": \"CLIENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "role"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Role - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUser\": \"{{createdUserId}}\",\n  \"role\": \"CLIENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "role"]
+            }
+          },
+          "response": []
+        },
+
+        {
+          "name": "Deletar Usuário - Sucesso (DELETE /{id})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 ou 204', function () {",
+                  "  pm.expect([200,204]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Usuário - Falha (usuário não existe) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{nonexistentUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{nonexistentUserId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Usuário - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// ===============================",
+          "// SHA-256 helper (Collection-level)",
+          "// ===============================",
+          "let CryptoJS;",
+          "try { CryptoJS = require('crypto-js'); } catch (e) { CryptoJS = global.CryptoJS; }",
+          "",
+          "function sha256Hex(text) {",
+          "  return CryptoJS.SHA256(text).toString(CryptoJS.enc.Hex);",
+          "}",
+          "",
+          "// 1) Login password hash",
+          "const loginPasswordPlain = pm.collectionVariables.get('loginPassword') || '';",
+          "if (loginPasswordPlain) {",
+          "  pm.collectionVariables.set('loginPasswordHash', sha256Hex(loginPasswordPlain));",
+          "}",
+          "",
+          "// 2) Password used on register user (default: 123456)",
+          "const novoUserSenhaPlain = pm.collectionVariables.get('novoUserSenhaPlain') || '123456';",
+          "pm.collectionVariables.set('novoUserSenhaHash', sha256Hex(novoUserSenhaPlain));",
+          "",
+          "// 3) Change password hashes",
+          "const senhaAtualPlain = pm.collectionVariables.get('senhaAtualPlain') || '123456';",
+          "const novaSenhaPlain = pm.collectionVariables.get('novaSenhaPlain') || 'NovaSenha@123';",
+          "pm.collectionVariables.set('senhaAtualHash', sha256Hex(senhaAtualPlain));",
+          "pm.collectionVariables.set('novaSenhaHash', sha256Hex(novaSenhaPlain));",
+          "",
+          "// 4) Non existent user id (for 404 tests)",
+          "pm.collectionVariables.set('nonexistentUserId', '999999999');"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+
+    { "key": "loginEmail", "value": "admin2@tech.com" },
+    { "key": "loginPassword", "value": "123456" },
+    { "key": "loginPasswordHash", "value": "" },
+
+    { "key": "createdUserId", "value": "" },
+    { "key": "createdUserEmail", "value": "" },
+    { "key": "createdUserNome", "value": "" },
+
+    { "key": "novoUserSenhaPlain", "value": "123456" },
+    { "key": "novoUserSenhaHash", "value": "" },
+
+    { "key": "senhaAtualPlain", "value": "123456" },
+    { "key": "novaSenhaPlain", "value": "NovaSenha@123" },
+    { "key": "senhaAtualHash", "value": "" },
+    { "key": "novaSenhaHash", "value": "" },
+
+    { "key": "nonexistentUserId", "value": "999999999" }
+  ]
+}

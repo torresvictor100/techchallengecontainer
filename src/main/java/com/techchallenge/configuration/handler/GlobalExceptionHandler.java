@@ -3,6 +3,7 @@ package com.techchallenge.configuration.handler;
 import com.techchallenge.modules.auth.dto.ErrorResponseDTO;
 import com.techchallenge.modules.auth.exception.EmailNotFoundException;
 import com.techchallenge.modules.auth.exception.InvalidPasswordException;
+import com.techchallenge.modules.usuario.exception.InvalidRoleException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
@@ -94,5 +95,12 @@ public class GlobalExceptionHandler {
         log.error("💥 Erro interno não tratado: {}", e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro interno no servidor"));
+    }
+
+    @ExceptionHandler(InvalidRoleException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidRole(InvalidRoleException e) {
+        log.warn("⚠️ Role inválida: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 }

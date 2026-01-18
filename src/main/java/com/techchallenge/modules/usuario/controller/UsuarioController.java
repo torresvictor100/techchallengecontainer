@@ -1,9 +1,6 @@
 package com.techchallenge.modules.usuario.controller;
 
-import com.techchallenge.modules.usuario.dto.UsuarioCreateDTO;
-import com.techchallenge.modules.usuario.dto.UsuarioResponseDTO;
-import com.techchallenge.modules.usuario.dto.UsuarioUpdateDTO;
-import com.techchallenge.modules.usuario.dto.UsuarioUpdateSenhaDTO;
+import com.techchallenge.modules.usuario.dto.*;
 import com.techchallenge.modules.usuario.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,7 +32,6 @@ public class UsuarioController {
     private HttpServletRequest request;
 
     private boolean isAdmin() {
-        String role = (String) request.getAttribute("role");
         return "ADMIN".equalsIgnoreCase((String) request.getAttribute("role"));
     }
 
@@ -64,7 +60,7 @@ public class UsuarioController {
                             schema = @Schema(implementation = UsuarioResponseDTO.class)))
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin")
+    @GetMapping("/todos")
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodos() {
 
         log.info("📌 [GET] Solicitação para listar todos os usuários...");
@@ -85,7 +81,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','PROPRIETARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','DONO')")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
 
@@ -122,13 +118,60 @@ public class UsuarioController {
         return ResponseEntity.ok(criado);
     }
 
+    @Operation(summary = "Atualizar role do usuário", description = "Atualiza a role de um usuário (apenas ADMIN pode alterar)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role atualizada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado (somente ADMIN)"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/role")
+    public ResponseEntity<UsuarioResponseDTO> atualizarRole(
+            @Valid @RequestBody UsuarioUpdateRoleDTO dto) {
+
+        log.info("🛡️ [PATCH] ADMIN solicitou atualização de role do usuário ID {} para {}",
+                dto.idUser(), dto.role());
+
+        UsuarioResponseDTO atualizado = service.atualizarRole(dto);
+
+        log.info("✅ Role atualizada com sucesso para usuário ID {}", dto.idUser());
+
+        return ResponseEntity.ok(atualizado);
+    }
+
+    @Operation(summary = "Buscar usuários por nome", description = "Busca usuários pelo nome (parcial) e retorna uma lista")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetro inválido"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
+    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','DONO')")
+    @GetMapping("/buscar")
+    public ResponseEntity<List<UsuarioResponseDTO>> buscarPorNome(@RequestParam String nome) {
+
+        log.info("🔍 [GET] Buscando usuários por nome: {}", nome);
+
+        if (!isAdmin()) {
+            log.warn("⛔ CLIENT tentou buscar usuários por nome!");
+            throw new SecurityException("Apenas administradores podem buscar usuários por nome");
+        }
+
+        List<UsuarioResponseDTO> lista = service.buscarPorNome(nome);
+
+        log.info("📄 {} usuários retornados na busca por nome '{}'", lista.size(), nome);
+
+        return ResponseEntity.ok(lista);
+    }
+
+
     @Operation(summary = "Atualizar usuário", description = "Atualiza os dados de um usuário existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
             @ApiResponse(responseCode = "400", description = "Erro nos dados enviados")
     })
-    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','PROPRIETARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','DONO')")
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizar(
             @PathVariable Long id,
@@ -153,7 +196,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
             @ApiResponse(responseCode = "400", description = "Erro nos dados enviados")
     })
-    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','PROPRIETARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','DONO')")
     @PatchMapping("/{id}/senha")
     public ResponseEntity<Void> atualizarSenha(
             @PathVariable Long id,
@@ -169,7 +212,7 @@ public class UsuarioController {
 
         log.info("✔ Senha atualizada para usuário ID {}", id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Deletar usuário", description = "Remove um usuário do sistema")
@@ -177,7 +220,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "204", description = "Usuário removido"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','PROPRIETARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN','CLIENT','DONO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
 
@@ -191,6 +234,6 @@ public class UsuarioController {
 
         log.info("🗑✔ Usuário ID {} deletado com sucesso!", id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

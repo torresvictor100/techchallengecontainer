@@ -1,5 +1,6 @@
 package com.techchallenge.modules.usuario.service;
 
+import com.techchallenge.modules.usuario.exception.InvalidRoleException;
 import com.techchallenge.modules.usuario.dto.*;
 import com.techchallenge.modules.usuario.entity.Usuario;
 import com.techchallenge.modules.usuario.entity.UsuarioRole;
@@ -73,6 +74,26 @@ public class UsuarioService {
         return UsuarioFactory.toResponseDTO(usuario);
     }
 
+    public List<UsuarioResponseDTO> buscarPorNome(String nome) {
+
+        log.info("🔎 Buscando usuários pelo nome contendo: {}", nome);
+
+        if (nome == null || nome.trim().isEmpty()) {
+            log.warn("⚠ Nome vazio enviado na busca!");
+            throw new IllegalArgumentException("O parâmetro 'nome' é obrigatório.");
+        }
+
+        List<UsuarioResponseDTO> usuarios = repository.findByNomeContainingIgnoreCase(nome.trim())
+                .stream()
+                .map(UsuarioFactory::toResponseDTO)
+                .toList();
+
+        log.info("✅ {} usuários encontrados para o nome: {}", usuarios.size(), nome);
+
+        return usuarios;
+    }
+
+
     public UsuarioResponseDTO criar(UsuarioCreateDTO dto) {
 
         log.info("📝 Criando novo usuário com email: {}", dto.email());
@@ -115,19 +136,19 @@ public class UsuarioService {
 
         Long id = Long.valueOf(dto.idUser());
 
-        log.info("✏ Atualizando usuário ID: {}", id);
-
         Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("❌ Usuário com ID {} não encontrado para atualização!", id);
-                    return new EntityNotFoundException("Usuário não encontrado");
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        UsuarioFactory.applyUpdateUserRole(usuario, UsuarioRole.valueOf(dto.role()));
+        UsuarioRole role;
+        try {
+            role = UsuarioRole.valueOf(dto.role().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRoleException("Role inválida.");
+        }
+
+        UsuarioFactory.applyUpdateUserRole(usuario, role);
 
         Usuario atualizado = repository.save(usuario);
-
-        log.info("✔ Usuário atualizado: ID {} para a role {}", atualizado.getId(), atualizado.getRole());
 
         return UsuarioFactory.toResponseDTO(atualizado);
     }
@@ -142,12 +163,20 @@ public class UsuarioService {
                     return new EntityNotFoundException("Usuário não encontrado");
                 });
 
+        boolean senhaOk = passwordEncoder.matches(dto.senhaAtual(), usuario.getSenha());
+
+        if (!senhaOk) {
+            log.warn("❌ Senha atual inválida para usuário {}", usuario.getEmail());
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+
         UsuarioFactory.applySenhaUpdate(usuario, passwordEncoder.encode(dto.novaSenha()));
 
         repository.save(usuario);
 
         log.info("✔ Senha atualizada com sucesso para o usuário {}", usuario.getEmail());
     }
+
 
     public void deletar(Long id) {
 

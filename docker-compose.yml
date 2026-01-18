@@ -34,6 +34,7 @@ services:
       db:
         condition: service_healthy
     environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_APPLICATION_NAME: ${SPRING_APP_NAME}
       SERVER_PORT: ${SERVER_PORT}
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
@@ -49,6 +50,7 @@ services:
       APP_AUTH_JWT_EXPIRATION_MS: ${APP_AUTH_JWT_EXPIRATION_MS}
     ports:
       - "8080:8080"
+      - "5005:5005"
     networks:
       - tech_network
 

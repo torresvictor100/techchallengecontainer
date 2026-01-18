@@ -1,5 +1,7 @@
 package com.techchallenge.modules.auth.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.techchallenge.modules.auth.dto.ErrorResponseDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -31,13 +33,15 @@ public class AuthFilter extends HttpFilter {
     private static final Logger log = LoggerFactory.getLogger(AuthFilter.class);
 
     private static final Set<String> PUBLIC_PATHS = Set.of(
-            "/api/auth/login",
+            "/v1/api/auth/login",
             "/swagger-ui",
             "/v3/api-docs",
             "/swagger-resources",
             "/webjars/",
-            "/api/usuarios/registrar"
+            "/v1/api/usuarios/registrar"
     );
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -48,7 +52,7 @@ public class AuthFilter extends HttpFilter {
 
         log.debug("🔎 Incoming request: [{}] {}", method, path);
 
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        if ("OPTIONS".equalsIgnoreCase(method)) {
             response.setStatus(HttpServletResponse.SC_OK);
             chain.doFilter(request, response);
             return;
@@ -62,7 +66,7 @@ public class AuthFilter extends HttpFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendUnauthorized(response, "Missing or malformed Authorization header");
+            sendUnauthorized(response, "Token ausente ou mal formatado. Use: Authorization: Bearer <token>");
             return;
         }
 
@@ -79,6 +83,7 @@ public class AuthFilter extends HttpFilter {
 
             String email = claims.getSubject();
             request.setAttribute("email", email);
+
             String role = claims.get("role", String.class);
             request.setAttribute("role", role);
 
@@ -95,23 +100,25 @@ public class AuthFilter extends HttpFilter {
 
         } catch (ExpiredJwtException e) {
             log.warn("⛔ Token expirado! Path: {}", path);
-            sendUnauthorized(response, "Token expired");
+            sendUnauthorized(response, "Token expirado. Faça login novamente.");
 
         } catch (Exception e) {
             log.error("❌ Erro ao validar token no path {} | Motivo: {}", path, e.getMessage());
-            sendUnauthorized(response, "Invalid token");
+            sendUnauthorized(response, "Token inválido.");
         }
     }
 
     private boolean isPublic(String path) {
-        log.debug("🌍 Path público detectado: {}", path);
         return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
     }
 
     private void sendUnauthorized(HttpServletResponse response, String message) throws IOException {
         log.warn("🔒 Acesso negado: {}", message);
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"" + message + "\"}");
+
+        ErrorResponseDTO error = new ErrorResponseDTO(401, message);
+        response.getWriter().write(mapper.writeValueAsString(error));
     }
 }

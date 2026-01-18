@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/v1/api/auth")
 @Tag(name = "Autenticação", description = "Endpoints de login e geração de token JWT")
 public class AuthController {
 
@@ -58,26 +58,6 @@ public class AuthController {
         LoginResponseDTO response = authService.login(dto);
 
         log.info("✅ Login bem-sucedido para: {}", dto.email());
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(
-            summary = "Renovar token JWT",
-            description = "Recebe o refresh token e retorna novos tokens gerados"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Token renovado com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Refresh token inválido")
-    })
-    @PostMapping("/refresh")
-    public ResponseEntity<RefreshTokenResponseDTO> refresh(@RequestBody RefreshTokenRequestDTO dto) {
-
-        log.info("♻️  Solicitada renovação do token");
-
-        RefreshTokenResponseDTO response = authService.refreshToken(dto.refreshToken());
-
-        log.info("🔁 Novo token JWT gerado com sucesso");
 
         return ResponseEntity.ok(response);
     }
