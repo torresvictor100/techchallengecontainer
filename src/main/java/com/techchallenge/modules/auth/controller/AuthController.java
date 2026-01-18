@@ -1,16 +1,22 @@
 package com.techchallenge.modules.auth.controller;
 
-import com.techchallenge.modules.auth.dto.*;
+import com.techchallenge.modules.auth.dto.ErrorResponseDTO;
+import com.techchallenge.modules.auth.dto.LoginRequestDTO;
+import com.techchallenge.modules.auth.dto.LoginResponseDTO;
+import com.techchallenge.modules.auth.dto.UserInfoDTO;
 import com.techchallenge.modules.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,13 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Autenticação", description = "Endpoints de login e geração de token JWT")
 public class AuthController {
 
-    @Value("${app.auth.email}")
-    private String configuredEmail;
-
-    @Value("${app.auth.password}")
-    private String configuredPassword;
-
-    private AuthService authService;
+    private final AuthService authService;
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
@@ -42,16 +42,56 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Login realizado com sucesso",
-                    content = @Content(mediaType = "application/json")
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoginResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Login OK",
+                                    value = "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n  \"refreshToken\": \"\"\n}"
+                            )
+                    )
             ),
             @ApiResponse(
                     responseCode = "401",
                     description = "Credenciais inválidas",
-                    content = @Content(mediaType = "application/json")
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Login inválido",
+                                    value = "{\n  \"status\": 401,\n  \"message\": \"Senha inválida\"\n}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Email não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Email não encontrado",
+                                    value = "{\n  \"status\": 404,\n  \"message\": \"Email não encontrado\"\n}"
+                            )
+                    )
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
+    public ResponseEntity<LoginResponseDTO> login(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Credenciais de login",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoginRequestDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Login Request",
+                                    value = "{\n  \"email\": \"admin@tech.com\",\n  \"password\": \"123456\"\n}"
+                            )
+                    )
+            )
+            @RequestBody LoginRequestDTO dto
+    ) {
 
         log.info("🔐 Tentativa de login para o email: {}", dto.email());
 
@@ -67,11 +107,47 @@ public class AuthController {
             description = "Lê o token JWT e retorna dados do usuário logado"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dados retornados com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Token inválido ou expirado")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Dados retornados com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserInfoDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Me OK",
+                                    value = "{\n  \"idUser\": 1,\n  \"email\": \"admin@tech.com\",\n  \"nome\": \"Admin\",\n  \"role\": \"ADMIN\"\n}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token inválido ou expirado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Token inválido",
+                                            value = "{\n  \"status\": 401,\n  \"message\": \"Token inválido\"\n}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Token expirado",
+                                            value = "{\n  \"status\": 401,\n  \"message\": \"Token expirado\"\n}"
+                                    )
+                            }
+                    )
+            )
     })
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/me")
-    public ResponseEntity<UserInfoDTO> getUserInfo(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<UserInfoDTO> getUserInfo(
+            @RequestHeader("Authorization")
+            @Parameter(
+                    description = "Bearer token JWT",
+                    example = "Bearer eyJhbGciOiJIUzI1NiJ9..."
+            )
+            String token
+    ) {
 
         log.info("👤 Solicitando informações do usuário autenticado");
 
@@ -81,5 +157,4 @@ public class AuthController {
 
         return ResponseEntity.ok(info);
     }
-
 }

@@ -90,6 +90,13 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDTO(HttpStatus.FORBIDDEN.value(), e.getMessage()));
     }
 
+    @ExceptionHandler(InvalidRoleException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidRole(InvalidRoleException e) {
+        log.warn("⚠️ Role inválida: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneral(Exception e) {
         log.error("💥 Erro interno não tratado: {}", e.getMessage(), e);
@@ -97,10 +104,5 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro interno no servidor"));
     }
 
-    @ExceptionHandler(InvalidRoleException.class)
-    public ResponseEntity<ErrorResponseDTO> handleInvalidRole(InvalidRoleException e) {
-        log.warn("⚠️ Role inválida: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
-    }
+
 }

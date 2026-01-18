@@ -1,163 +1,98 @@
----
 
-# ✅ **Como subir a aplicação Spring Boot com Docker**
-
-````markdown
 # TechChallenge – Backend (Spring Boot + Docker)
 
-Este projeto é um backend Spring Boot (Java 21) configurado para rodar totalmente via Docker utilizando Dockerfile e Docker Compose
-
-O objetivo deste README é explicar exatamente o que você precisa instalar e como subir a aplicação usando contêineres, de forma simples e rápida.
+Backend em Spring Boot 3.5 (Java 21) com MySQL 8 e Docker Compose. Este guia traz o passo a passo para subir o projeto, configurar variáveis e acessar a API.
 
 ---
 
-## ✅ 1. Requisitos necessários
+## Stack principal
+- Java 21 + Spring Boot 3.5
+- MySQL 8.2 (exposto na porta local `3307`)
+- Gradle, Docker e Docker Compose
+- Swagger UI (OpenAPI) para documentação
 
-Antes de rodar o projeto, instale:
+## Pré-requisitos
+- Docker + Docker Compose
+- Git
 
-### **Docker**
+## Como rodar rapidamente
+1. Clonar o repositório
+   ```bash
+   git clone git@github.com:torresvictor100/techchallengecontainer.git
+   cd techchallengecontainer
+   ```
+2. Criar o arquivo `.env`
+   ```bash
+   cp .env.exemplo .env
+   ```
+   Preencha (ou mantenha) os valores:
+   ```env
+   SERVER_PORT=8080
+
+   # Banco de Dados
+   MYSQL_ROOT_PASSWORD=root
+   MYSQL_DATABASE=techchallenge
+   MYSQL_USER=user
+   MYSQL_PASSWORD=user123
+
+   # Autenticação / JWT
+   APP_AUTH_EMAIL=admin@tech.com
+   APP_AUTH_PASSWORD=123456
+   APP_AUTH_JWT_SECRET=MinhaChaveSuperSecreta1234567890
+   APP_AUTH_JWT_EXPIRATION_MS=86400000
+
+   # Datasource
+   SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/techchallenge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+   SPRING_DATASOURCE_USERNAME=user
+   SPRING_DATASOURCE_PASSWORD=user123
+
+   # JPA / Hibernate
+   SPRING_JPA_HIBERNATE_DDL_AUTO=update
+   SPRING_JPA_SHOW_SQL=true
+   SPRING_JPA_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+   ```
+   ⚠️ Não faça commit do `.env`.
+3. Subir tudo com Docker Compose
+   ```bash
+   docker compose up -d --build
+   ```
+   - `tech_db`: MySQL (porta externa `3307`, interna `3306`)
+   - `tech_app`: aplicação Spring Boot (porta `8080`, debug remoto `5005`)
+4. Conferir os containers
+   ```bash
+   docker compose ps
+   ```
+
+## Acessos úteis
+- API base: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui/index.html
+- MySQL local: `localhost:3307` (usuário e senha do `.env`)
+- Logs: `docker logs -f tech_app` e `docker logs -f tech_db`
+
+## Credenciais padrão
+- Admin: `admin@tech.com` / `123456` (criado no startup)
+
+## Resetar ambiente
 ```bash
-sudo apt update
-sudo apt install docker.io -y
-````
-
-Ou instalação oficial:
-
-```bash
-curl -fsSL https://get.docker.com | sudo sh
-```
-
-### **Docker Compose**
-
-Verifique se está instalado:
-
-```bash
-docker compose version
-```
-
-### **Git**
-
-```bash
-sudo apt install git -y
-```
-
-Pronto. Isso é tudo o que precisa.
-
----
-
-## ✅ 2. Clonar o repositório
-
-```bash
-git clone git@github.com:torresvictor100/techchallengecontainer.git
-cd techchallengecontainer
-```
-
----
-
-## ✅ 3. Criar arquivo `.env`
-
-O Docker Compose utiliza variáveis de ambiente para configurar o MySQL e o Spring Boot.
-
-Crie o arquivo `.env` na raiz do projeto com as variáveis igualarquivo `.env.exemplo` a baixo esta um exemplo de variaveis:
-
-```env
-
-MYSQL_ROOT_PASSWORD=root
-MYSQL_DATABASE=techchallenge
-MYSQL_USER=user
-MYSQL_PASSWORD=user123
-
-SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/techchallenge?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-SPRING_DATASOURCE_USERNAME=user
-SPRING_DATASOURCE_PASSWORD=user123
-
-SPRING_JPA_HIBERNATE_DDL_AUTO=update
-SPRING_JPA_SHOW_SQL=true
-SPRING_JPA_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
-```
-
-⚠ **Nunca faça commit do `.env`.**
-
----
-
-## ✅ 4. Subindo a aplicação usando Docker Compose
-
-Execute:
-
-```bash
+docker compose down --rmi all --volumes --remove-orphans
 docker compose up -d --build
 ```
 
-Isso irá:
-
-* Criar o contêiner do **MySQL**
-* Criar o contêiner da aplicação **Spring Boot**
-* Iniciar tudo automaticamente
-
-Ver os containers:
-
-```bash
-docker compose ps
-```
-
----
-
-## ✅ 5. Ver logs da aplicação
-
-Logs do backend:
-
-```bash
-docker logs -f tech_app
-```
-
-Logs do MySQL:
-
-```bash
-docker logs -f tech_db
-```
-
----
-
-## ✅ 6. Acessar a API
-
-A API estará disponível em:
-
-```
-http://localhost:8080
-```
-
----
-
-## ✅ 7. Resetar tudo (limpar e subir de novo)
-
-Se quiser limpar completamente:
-
-```bash
-docker compose down --rmi all --volumes --remove-orphans
-```
-
-Depois subir novamente:
-
-```bash
-docker compose build --no-cache
-docker compose up -d
-```
-
----
-
-## ✅ 8. Estrutura do projeto
-
+## Estrutura do projeto
 ```
 techchallengecontainer/
-│── src/
-│── Dockerfile
-│── docker-compose.yml
-│── .env
-│── .gitignore
-│── build.gradle
-│── settings.gradle
-└── README.md
+├─ src/
+├─ Dockerfile
+├─ docker-compose.yml
+├─ .env / .env.exemplo
+├─ build.gradle
+├─ settings.gradle
+└─ README.md
 ```
+
+## Extras
+- Coleção Postman: `colletion.json` (importe para testar os endpoints).
+- Debug remoto: porta `5005` exposta pelo container `tech_app`.
 
 ---
 
