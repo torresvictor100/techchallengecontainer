@@ -1,9 +1,9 @@
 package com.techchallenge.configuration.handler;
 
-import com.techchallenge.modules.auth.dto.ErrorResponseDTO;
-import com.techchallenge.modules.auth.exception.EmailNotFoundException;
-import com.techchallenge.modules.auth.exception.InvalidPasswordException;
-import com.techchallenge.modules.usuario.exception.InvalidRoleException;
+import com.techchallenge.domain.auth.dto.ErrorResponseDTO;
+import com.techchallenge.domain.auth.exception.EmailNotFoundException;
+import com.techchallenge.domain.auth.exception.InvalidPasswordException;
+import com.techchallenge.domain.usuario.exception.InvalidRoleException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;

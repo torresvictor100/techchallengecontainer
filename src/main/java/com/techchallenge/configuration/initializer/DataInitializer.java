@@ -1,8 +1,8 @@
 package com.techchallenge.configuration.initializer;
 
-import com.techchallenge.modules.usuario.entity.Usuario;
-import com.techchallenge.modules.usuario.entity.UsuarioRole;
-import com.techchallenge.modules.usuario.repository.UsuarioRepository;
+import com.techchallenge.domain.usuario.entity.Usuario;
+import com.techchallenge.domain.usuario.entity.UsuarioRole;
+import com.techchallenge.domain.usuario.repository.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
