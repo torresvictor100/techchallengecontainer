@@ -414,7 +414,7 @@
         },
 
         {
-          "name": "Buscar Usuários por Nome - Sucesso (GET /buscar?nome=...) [ADMIN]",
+          "name": "Buscar Usuários por Nome - Sucesso (GET /buscar?nome=...)",
           "event": [
             {
               "listen": "test",

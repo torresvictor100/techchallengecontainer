@@ -399,10 +399,6 @@ public class UsuarioController {
 
         log.info("🔍 [GET] Buscando usuários por nome: {}", nome);
 
-        if (!isAdmin()) {
-            log.warn("⛔ CLIENT tentou buscar usuários por nome!");
-            throw new SecurityException("Apenas administradores podem buscar usuários por nome");
-        }
 
         List<UsuarioResponseDTO> lista = service.buscarPorNome(nome);
 
