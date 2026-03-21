@@ -38,9 +38,31 @@ public class RestauranteController {
         this.service = service;
     }
 
-    @Operation(summary = "Listar restaurantes")
+    @Operation(summary = "Listar restaurantes", description = "Retorna todos os restaurantes (requer autenticação)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista de restaurantes",
+                                    value = "[\n  {\n    \"id\": 1,\n    \"nome\": \"Cantina da Praca\",\n    \"endereco\": \"Rua Central, 100 - Recife\",\n    \"tipoCozinha\": \"Italiana\",\n    \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n    \"donoId\": 1,\n    \"donoNome\": \"Administrador\",\n    \"donoEmail\": \"admin2@tech.com\"\n  }\n]"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou inválido",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Unauthorized",
+                                    value = "{\n  \"status\": 401,\n  \"message\": \"Token inválido\"\n}"
+                            )
+                    )
+            )
     })
     @GetMapping
     public ResponseEntity<List<RestauranteResponseDTO>> listarTodos() {
@@ -48,12 +70,28 @@ public class RestauranteController {
         return ResponseEntity.ok(service.listarTodos());
     }
 
-    @Operation(summary = "Buscar restaurante por ID")
+    @Operation(summary = "Buscar restaurante por ID", description = "Retorna um restaurante específico (requer autenticação)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Restaurante encontrado"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurante encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RestauranteResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Restaurante encontrado",
+                                    value = "{\n  \"id\": 1,\n  \"nome\": \"Cantina da Praca\",\n  \"endereco\": \"Rua Central, 100 - Recife\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": 1,\n  \"donoNome\": \"Administrador\",\n  \"donoEmail\": \"admin2@tech.com\"\n}"
+                            )
+                    )
+            ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Restaurante não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou inválido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             )
     })
@@ -66,12 +104,33 @@ public class RestauranteController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    @Operation(summary = "Criar restaurante")
+    @Operation(summary = "Criar restaurante", description = "Cria um novo restaurante (requer autenticação)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Restaurante criado com sucesso"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurante criado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RestauranteResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Restaurante criado",
+                                    value = "{\n  \"id\": 10,\n  \"nome\": \"Cantina da Praca\",\n  \"endereco\": \"Rua Central, 100 - Recife\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": 2,\n  \"donoNome\": \"Joao\",\n  \"donoEmail\": \"joao@tech.com\"\n}"
+                            )
+                    )
+            ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Dados inválidos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Dono do restaurante não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou inválido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             )
     })
@@ -85,7 +144,7 @@ public class RestauranteController {
                             schema = @Schema(implementation = RestauranteCreateDTO.class),
                             examples = @ExampleObject(
                                     name = "Request",
-                                    value = "{\n  \"nome\": \"Cantina da Praça\",\n  \"endereco\": \"Rua Central, 100\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": 2\n}"
+                                    value = "{\n  \"nome\": \"Cantina da Praca\",\n  \"endereco\": \"Rua Central, 100 - Recife\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": 2\n}"
                             )
                     )
             )
@@ -95,12 +154,33 @@ public class RestauranteController {
         return ResponseEntity.ok(service.criar(dto));
     }
 
-    @Operation(summary = "Atualizar restaurante")
+    @Operation(summary = "Atualizar restaurante", description = "Atualiza um restaurante existente (requer autenticação)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Restaurante atualizado com sucesso"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurante atualizado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RestauranteResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Restaurante atualizado",
+                                    value = "{\n  \"id\": 1,\n  \"nome\": \"Cantina Atualizada\",\n  \"endereco\": \"Av. Nova, 200 - Recife\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Sex 10:00-22:00\",\n  \"donoId\": 2,\n  \"donoNome\": \"Joao\",\n  \"donoEmail\": \"joao@tech.com\"\n}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Restaurante não encontrado",
+                    description = "Restaurante ou dono não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou inválido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             )
     })
@@ -115,12 +195,17 @@ public class RestauranteController {
         return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
-    @Operation(summary = "Deletar restaurante")
+    @Operation(summary = "Deletar restaurante", description = "Remove um restaurante (requer autenticação)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Restaurante removido com sucesso"),
             @ApiResponse(
                     responseCode = "404",
                     description = "Restaurante não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou inválido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             )
     })

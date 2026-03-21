@@ -44,9 +44,24 @@ public class TipoUsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    @Operation(summary = "Listar tipos de usuário")
+    @Operation(summary = "Listar tipos de usuario", description = "Retorna todos os tipos cadastrados (requer autenticacao)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista de tipos",
+                                    value = "[\n  {\n    \"id\": 1,\n    \"nome\": \"Cliente\"\n  },\n  {\n    \"id\": 2,\n    \"nome\": \"Dono de Restaurante\"\n  }\n]"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            )
     })
     @GetMapping
     public ResponseEntity<List<TipoUsuarioResponseDTO>> listarTodos() {
@@ -54,12 +69,28 @@ public class TipoUsuarioController {
         return ResponseEntity.ok(service.listarTodos());
     }
 
-    @Operation(summary = "Buscar tipo de usuário por ID")
+    @Operation(summary = "Buscar tipo de usuario por ID", description = "Retorna um tipo especifico (requer autenticacao)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tipo encontrado"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tipo encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TipoUsuarioResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Tipo encontrado",
+                                    value = "{\n  \"id\": 1,\n  \"nome\": \"Cliente\"\n}"
+                            )
+                    )
+            ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Tipo não encontrado",
+                    description = "Tipo nao encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             )
     })
@@ -88,6 +119,11 @@ public class TipoUsuarioController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Tipo de usuário não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             ),
             @ApiResponse(
@@ -133,6 +169,11 @@ public class TipoUsuarioController {
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
                     responseCode = "403",
                     description = "Acesso negado",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
@@ -156,7 +197,14 @@ public class TipoUsuarioController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Tipo atualizado com sucesso",
-                    content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Usuario atualizado",
+                                    value = "{\n  \"id\": 2,\n  \"nome\": \"Joao\",\n  \"email\": \"joao@tech.com\",\n  \"endereco\": \"Rua B, 456\",\n  \"role\": \"CLIENT\",\n  \"tipoUsuario\": {\n    \"id\": 1,\n    \"nome\": \"Cliente\"\n  }\n}"
+                            )
+                    )
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -166,6 +214,11 @@ public class TipoUsuarioController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Usuário ou tipo não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             ),
             @ApiResponse(
@@ -203,10 +256,26 @@ public class TipoUsuarioController {
 
     @Operation(summary = "Criar tipo de usuário", description = "Cria um novo tipo (somente ADMIN)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tipo criado com sucesso"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tipo criado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TipoUsuarioResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Tipo criado",
+                                    value = "{\n  \"id\": 10,\n  \"nome\": \"NovoTipo\"\n}"
+                            )
+                    )
+            ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Dados inválidos",
+                    description = "Dados invalidos ou tipo duplicado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             ),
             @ApiResponse(
@@ -226,7 +295,7 @@ public class TipoUsuarioController {
                             schema = @Schema(implementation = TipoUsuarioCreateDTO.class),
                             examples = @ExampleObject(
                                     name = "Request",
-                                    value = "{\n  \"nome\": \"Cliente\"\n}"
+                                    value = "{\n  \"nome\": \"NovoTipo\"\n}"
                             )
                     )
             )
@@ -238,10 +307,31 @@ public class TipoUsuarioController {
 
     @Operation(summary = "Atualizar tipo de usuário", description = "Atualiza um tipo existente (somente ADMIN)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tipo atualizado com sucesso"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tipo atualizado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TipoUsuarioResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Tipo atualizado",
+                                    value = "{\n  \"id\": 1,\n  \"nome\": \"ClienteAtualizado\"\n}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados invalidos ou tipo duplicado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Tipo não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             ),
             @ApiResponse(
@@ -268,6 +358,11 @@ public class TipoUsuarioController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Tipo não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token ausente ou invalido",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
             ),
             @ApiResponse(
