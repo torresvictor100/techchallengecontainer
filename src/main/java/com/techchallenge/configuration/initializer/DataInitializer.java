@@ -23,9 +23,9 @@ public class DataInitializer {
                                                TipoUsuarioRepository tipoUsuarioRepository) {
         return args -> {
 
-            criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Cliente");
             TipoUsuario donoRestaurante = criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Dono de Restaurante");
-
+            criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Cliente");
+            
             criarAdminComSha256(repository, encoder,
                     "admin2@tech.com", "123456", donoRestaurante);
 

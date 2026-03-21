@@ -1167,7 +1167,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioId}}/usuarios",
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioDonoId}}/usuarios",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1175,7 +1175,7 @@
                 "v1",
                 "api",
                 "tipos-usuario",
-                "{{tipoUsuarioId}}",
+                "{{tipoUsuarioDonoId}}",
                 "usuarios"
               ]
             }
@@ -2001,6 +2001,10 @@
     {
       "key": "restauranteId",
       "value": "2"
+    },
+    {
+      "key": "tipoUsuarioDonoId",
+      "value": "1"
     },
     {
       "key": "itemCardapioId",
