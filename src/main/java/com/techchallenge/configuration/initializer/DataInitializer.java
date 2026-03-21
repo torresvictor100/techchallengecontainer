@@ -1,5 +1,7 @@
 package com.techchallenge.configuration.initializer;
 
+import com.techchallenge.domain.restaurante.entity.Restaurante;
+import com.techchallenge.domain.restaurante.repository.RestauranteRepository;
 import com.techchallenge.domain.tipousuario.entity.TipoUsuario;
 import com.techchallenge.domain.tipousuario.repository.TipoUsuarioRepository;
 import com.techchallenge.domain.usuario.entity.Usuario;
@@ -20,7 +22,8 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner createDefaultUser(UsuarioRepository repository,
                                                PasswordEncoder encoder,
-                                               TipoUsuarioRepository tipoUsuarioRepository) {
+                                               TipoUsuarioRepository tipoUsuarioRepository,
+                                               RestauranteRepository restauranteRepository) {
         return args -> {
 
             TipoUsuario donoRestaurante = criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Dono de Restaurante");
@@ -31,6 +34,21 @@ public class DataInitializer {
 
             criarAdminSemSha256(repository, encoder,
                     "admin@tech.com", "123456", donoRestaurante);
+
+            Usuario adminSha = repository.findByEmail("admin2@tech.com").orElse(null);
+            Usuario adminLegacy = repository.findByEmail("admin@tech.com").orElse(null);
+
+            criarRestauranteSeNaoExiste(restauranteRepository, adminSha,
+                    "Cantina da Praca",
+                    "Rua Central, 100 - Recife",
+                    "Italiana",
+                    "Seg-Dom 11:00-23:00");
+
+            criarRestauranteSeNaoExiste(restauranteRepository, adminLegacy,
+                    "Sabor Nordestino",
+                    "Av. Recife, 500 - Recife",
+                    "Nordestina",
+                    "Seg-Sab 11:00-22:00");
         };
     }
 
@@ -112,6 +130,35 @@ public class DataInitializer {
                 System.out.println("✅ Tipo atualizado para o usuário: " + email);
             }
         });
+    }
+
+    private void criarRestauranteSeNaoExiste(RestauranteRepository repository, Usuario dono,
+                                             String nome, String endereco, String tipoCozinha,
+                                             String horarioFuncionamento) {
+        if (dono == null) {
+            System.out.println("⚠ Dono não encontrado para criar restaurante: " + nome);
+            return;
+        }
+
+        repository.findByNomeIgnoreCase(nome)
+                .ifPresentOrElse(restaurante -> {
+                    if (restaurante.getDono() == null
+                            || !restaurante.getDono().getId().equals(dono.getId())) {
+                        restaurante.setDono(dono);
+                        repository.save(restaurante);
+                        System.out.println("✅ Dono atualizado para restaurante: " + nome);
+                    }
+                }, () -> {
+                    Restaurante novo = new Restaurante();
+                    novo.setNome(nome);
+                    novo.setEndereco(endereco);
+                    novo.setTipoCozinha(tipoCozinha);
+                    novo.setHorarioFuncionamento(horarioFuncionamento);
+                    novo.setDono(dono);
+
+                    repository.save(novo);
+                    System.out.println("✅ Restaurante criado: " + nome);
+                });
     }
 
     private String sha256(String input) {

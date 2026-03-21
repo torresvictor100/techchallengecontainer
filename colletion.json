@@ -1592,6 +1592,30 @@
       "item": [
         {
           "name": "Listar restaurantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "if (Array.isArray(json) && json.length > 0) {",
+                  "  const praca = json.find(r => (r.nome || '').toLowerCase() === 'cantina da praca');",
+                  "  const nordestino = json.find(r => (r.nome || '').toLowerCase() === 'sabor nordestino');",
+                  "",
+                  "  if (praca) pm.collectionVariables.set('restauranteId', praca.id);",
+                  "  if (nordestino) pm.collectionVariables.set('restauranteId2', nordestino.id);",
+                  "",
+                  "  if (!praca && json[0]) pm.collectionVariables.set('restauranteId', json[0].id);",
+                  "  if (!nordestino && json[1]) pm.collectionVariables.set('restauranteId2', json[1].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -1647,6 +1671,134 @@
           "response": []
         },
         {
+          "name": "Criar restaurante - Falha (campos obrigatórios) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"endereco\": \"\",\n  \"tipoCozinha\": \"\",\n  \"horarioFuncionamento\": \"\",\n  \"donoId\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar restaurante - Falha (dono inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Restaurante X\",\n  \"endereco\": \"Rua Y, 10\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Dom 10:00-22:00\",\n  \"donoId\": {{nonexistentUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar restaurante - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Restaurante Sem Token\",\n  \"endereco\": \"Rua Z, 99\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": {{createdUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Buscar restaurante por ID",
           "request": {
             "method": "GET",
@@ -1666,6 +1818,43 @@
                 "api",
                 "restaurantes",
                 "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar restaurante por ID - Falha (id inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteIdErrado}}"
               ]
             }
           },
@@ -1705,6 +1894,182 @@
           "response": []
         },
         {
+          "name": "Atualizar restaurante - Falha (campos inválidos) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"endereco\": \"\",\n  \"tipoCozinha\": \"\",\n  \"horarioFuncionamento\": \"\",\n  \"donoId\": {{createdUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar restaurante - Falha (id inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Restaurante Atualizado\",\n  \"endereco\": \"Av. Nova, 200\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Sex 10:00-22:00\",\n  \"donoId\": {{createdUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteIdErrado}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar restaurante - Falha (dono inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Restaurante Atualizado\",\n  \"endereco\": \"Av. Nova, 200\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Sex 10:00-22:00\",\n  \"donoId\": {{nonexistentUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar restaurante - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Restaurante Atualizado\",\n  \"endereco\": \"Av. Nova, 200\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Sex 10:00-22:00\",\n  \"donoId\": {{createdUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Deletar restaurante",
           "request": {
             "method": "DELETE",
@@ -1714,6 +2079,75 @@
                 "value": "Bearer {{accessToken}}"
               }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar restaurante - Falha (id inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteIdErrado}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar restaurante - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
               "host": [
@@ -2001,6 +2435,14 @@
     {
       "key": "restauranteId",
       "value": "2"
+    },
+    {
+      "key": "restauranteId2",
+      "value": "3"
+    },
+    {
+      "key": "restauranteIdErrado",
+      "value": "999999"
     },
     {
       "key": "tipoUsuarioDonoId",
