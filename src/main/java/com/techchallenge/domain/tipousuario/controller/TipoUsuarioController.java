@@ -5,6 +5,9 @@ import com.techchallenge.domain.tipousuario.dto.TipoUsuarioCreateDTO;
 import com.techchallenge.domain.tipousuario.dto.TipoUsuarioResponseDTO;
 import com.techchallenge.domain.tipousuario.dto.TipoUsuarioUpdateDTO;
 import com.techchallenge.domain.tipousuario.service.TipoUsuarioService;
+import com.techchallenge.domain.usuario.dto.UsuarioUpdateTipoEmailDTO;
+import com.techchallenge.domain.usuario.dto.UsuarioResponseDTO;
+import com.techchallenge.domain.usuario.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,10 +36,12 @@ public class TipoUsuarioController {
     private static final Logger log = LoggerFactory.getLogger(TipoUsuarioController.class);
 
     private final TipoUsuarioService service;
+    private final UsuarioService usuarioService;
 
     @Autowired
-    public TipoUsuarioController(TipoUsuarioService service) {
+    public TipoUsuarioController(TipoUsuarioService service, UsuarioService usuarioService) {
         this.service = service;
+        this.usuarioService = usuarioService;
     }
 
     @Operation(summary = "Listar tipos de usuário")
@@ -65,6 +70,135 @@ public class TipoUsuarioController {
 
         log.info("🔍 [GET] Buscando tipo de usuário ID {}", id);
         return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+    @Operation(summary = "Buscar usuários por tipo (ID)", description = "Lista usuários de um tipo específico (somente ADMIN)")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuários do tipo (ID)",
+                                    value = "[\n  {\n    \"id\": 3,\n    \"nome\": \"Maria\",\n    \"email\": \"maria@tech.com\",\n    \"endereco\": \"Rua C, 789\",\n    \"role\": \"CLIENT\"\n  }\n]"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Tipo de usuário não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            )
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/usuarios")
+    public ResponseEntity<List<UsuarioResponseDTO>> buscarUsuariosPorTipoId(
+            @Parameter(description = "ID do tipo de usuário", example = "1")
+            @PathVariable Long id) {
+
+        log.info("🔍 [GET] Buscando usuários por tipo ID: {}", id);
+        List<UsuarioResponseDTO> lista = usuarioService.buscarPorTipo(id);
+        log.info("📄 {} usuários retornados para o tipo ID {}", lista.size(), id);
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @Operation(summary = "Buscar usuários por nome do tipo", description = "Lista usuários pelo nome do tipo (somente ADMIN)")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuários do tipo (nome)",
+                                    value = "[\n  {\n    \"id\": 4,\n    \"nome\": \"Pedro\",\n    \"email\": \"pedro@tech.com\",\n    \"endereco\": \"Rua D, 321\",\n    \"role\": \"CLIENT\"\n  }\n]"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Parâmetro inválido",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Tipo de usuário não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            )
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/usuarios")
+    public ResponseEntity<List<UsuarioResponseDTO>> buscarUsuariosPorTipoNome(
+            @Parameter(description = "Nome do tipo de usuário", example = "Cliente")
+            @RequestParam String tipoNome) {
+
+        log.info("🔍 [GET] Buscando usuários por tipo nome: {}", tipoNome);
+        List<UsuarioResponseDTO> lista = usuarioService.buscarPorTipoNome(tipoNome);
+        log.info("📄 {} usuários retornados para o tipo nome {}", lista.size(), tipoNome);
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @Operation(summary = "Atualizar tipo do usuário por email", description = "Atualiza o tipo de um usuário informando o email (somente ADMIN)")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tipo atualizado com sucesso",
+                    content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário ou tipo não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
+            )
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/usuarios/tipo")
+    public ResponseEntity<UsuarioResponseDTO> atualizarTipoUsuarioPorEmail(
+            @Valid
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Dados para atualizar tipo do usuário por email",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioUpdateTipoEmailDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Request tipo por email",
+                                    value = "{\n  \"email\": \"joao@tech.com\",\n  \"tipoUsuarioId\": 1\n}"
+                            )
+                    )
+            )
+            @RequestBody UsuarioUpdateTipoEmailDTO dto) {
+
+        log.info("🧩 [PATCH] ADMIN solicitou atualização de tipo do usuário por email {}", dto.email());
+
+        UsuarioResponseDTO atualizado = usuarioService.atualizarTipoUsuarioPorEmail(dto.email(), dto.tipoUsuarioId());
+
+        log.info("✅ Tipo atualizado com sucesso para o usuário {}", dto.email());
+
+        return ResponseEntity.ok(atualizado);
     }
 
     @Operation(summary = "Criar tipo de usuário", description = "Cria um novo tipo (somente ADMIN)")

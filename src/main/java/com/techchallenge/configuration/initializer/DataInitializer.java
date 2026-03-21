@@ -24,13 +24,13 @@ public class DataInitializer {
         return args -> {
 
             criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Cliente");
-            criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Dono de Restaurante");
+            TipoUsuario donoRestaurante = criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Dono de Restaurante");
 
             criarAdminComSha256(repository, encoder,
-                    "admin2@tech.com", "123456");
+                    "admin2@tech.com", "123456", donoRestaurante);
 
             criarAdminSemSha256(repository, encoder,
-                    "admin@tech.com", "123456");
+                    "admin@tech.com", "123456", donoRestaurante);
         };
     }
 
@@ -44,9 +44,10 @@ public class DataInitializer {
     }
 
     private void criarAdminComSha256(UsuarioRepository repository, PasswordEncoder encoder,
-                                     String email, String senhaPura) {
+                                     String email, String senhaPura, TipoUsuario tipoUsuario) {
 
         if (repository.existsByEmail(email)) {
+            atualizarTipoSeNecessario(repository, email, tipoUsuario);
             System.out.println("⚠ Admin (SHA256) já existe: " + email);
             return;
         }
@@ -57,7 +58,8 @@ public class DataInitializer {
         Usuario admin = novoUsuario(
                 "Administrador",
                 email,
-                senhaFinal
+                senhaFinal,
+                tipoUsuario
         );
 
         repository.save(admin);
@@ -66,9 +68,10 @@ public class DataInitializer {
     }
 
     private void criarAdminSemSha256(UsuarioRepository repository, PasswordEncoder encoder,
-                                     String email, String senhaPura) {
+                                     String email, String senhaPura, TipoUsuario tipoUsuario) {
 
         if (repository.existsByEmail(email)) {
+            atualizarTipoSeNecessario(repository, email, tipoUsuario);
             System.out.println("⚠ Admin (sem SHA256) já existe: " + email);
             return;
         }
@@ -78,7 +81,8 @@ public class DataInitializer {
         Usuario admin = novoUsuario(
                 "Administrador (Legacy)",
                 email,
-                senhaFinal
+                senhaFinal,
+                tipoUsuario
         );
 
         repository.save(admin);
@@ -86,7 +90,7 @@ public class DataInitializer {
         System.out.println("⚠ Admin criado sem SHA-256 (somente BCrypt): " + email);
     }
 
-    private Usuario novoUsuario(String nome, String email, String senha) {
+    private Usuario novoUsuario(String nome, String email, String senha, TipoUsuario tipoUsuario) {
         Usuario u = new Usuario();
         u.setNome(nome);
         u.setEmail(email);
@@ -94,7 +98,20 @@ public class DataInitializer {
         u.setEndereco("Sistema interno");
         u.setUltimaAtualizacao(LocalDateTime.now());
         u.setRole(UsuarioRole.ADMIN);
+        u.setTipoUsuario(tipoUsuario);
         return u;
+    }
+
+    private void atualizarTipoSeNecessario(UsuarioRepository repository, String email, TipoUsuario tipoUsuario) {
+        repository.findByEmail(email).ifPresent(usuario -> {
+            if (tipoUsuario != null && (usuario.getTipoUsuario() == null
+                    || !usuario.getTipoUsuario().getId().equals(tipoUsuario.getId()))) {
+                usuario.setTipoUsuario(tipoUsuario);
+                usuario.setUltimaAtualizacao(LocalDateTime.now());
+                repository.save(usuario);
+                System.out.println("✅ Tipo atualizado para o usuário: " + email);
+            }
+        });
     }
 
     private String sha256(String input) {

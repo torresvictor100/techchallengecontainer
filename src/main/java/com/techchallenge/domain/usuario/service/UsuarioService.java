@@ -100,6 +100,50 @@ public class UsuarioService {
         return usuarios;
     }
 
+    public List<UsuarioResponseDTO> buscarPorTipo(Long tipoUsuarioId) {
+
+        log.info("🔎 Buscando usuários pelo tipo ID: {}", tipoUsuarioId);
+
+        if (tipoUsuarioId == null) {
+            log.warn("⚠ Tipo de usuário vazio enviado na busca!");
+            throw new IllegalArgumentException("O parâmetro 'tipoUsuarioId' é obrigatório.");
+        }
+
+        tipoUsuarioRepository.findById(tipoUsuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de usuário não encontrado"));
+
+        List<UsuarioResponseDTO> usuarios = repository.findByTipoUsuarioId(tipoUsuarioId)
+                .stream()
+                .map(UsuarioFactory::toResponseDTO)
+                .toList();
+
+        log.info("✅ {} usuários encontrados para o tipo ID: {}", usuarios.size(), tipoUsuarioId);
+
+        return usuarios;
+    }
+
+    public List<UsuarioResponseDTO> buscarPorTipoNome(String tipoNome) {
+
+        log.info("🔎 Buscando usuários pelo tipo nome: {}", tipoNome);
+
+        if (tipoNome == null || tipoNome.trim().isEmpty()) {
+            log.warn("⚠ Tipo de usuário vazio enviado na busca!");
+            throw new IllegalArgumentException("O parâmetro 'tipoNome' é obrigatório.");
+        }
+
+        TipoUsuario tipoUsuario = tipoUsuarioRepository.findByNomeIgnoreCase(tipoNome.trim())
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de usuário não encontrado"));
+
+        List<UsuarioResponseDTO> usuarios = repository.findByTipoUsuarioId(tipoUsuario.getId())
+                .stream()
+                .map(UsuarioFactory::toResponseDTO)
+                .toList();
+
+        log.info("✅ {} usuários encontrados para o tipo nome: {}", usuarios.size(), tipoNome);
+
+        return usuarios;
+    }
+
 
     public UsuarioResponseDTO criar(UsuarioCreateDTO dto) {
 
@@ -170,6 +214,34 @@ public class UsuarioService {
         log.info("🔄 Atualizando tipo de usuário ID {} para tipo {}", id, tipoUsuarioId);
 
         Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(tipoUsuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de usuário não encontrado"));
+
+        usuario.setTipoUsuario(tipoUsuario);
+        usuario.setUltimaAtualizacao(java.time.LocalDateTime.now());
+
+        Usuario atualizado = repository.save(usuario);
+
+        return UsuarioFactory.toResponseDTO(atualizado);
+    }
+
+    public UsuarioResponseDTO atualizarTipoUsuarioPorEmail(String email, Long tipoUsuarioId) {
+
+        log.info("🔄 Atualizando tipo de usuário por email: {}", email);
+
+        if (email == null || email.trim().isEmpty()) {
+            log.warn("⚠ Email vazio enviado na atualização de tipo!");
+            throw new IllegalArgumentException("O parâmetro 'email' é obrigatório.");
+        }
+
+        if (tipoUsuarioId == null) {
+            log.warn("⚠ Tipo de usuário vazio enviado na atualização de tipo!");
+            throw new IllegalArgumentException("O parâmetro 'tipoUsuarioId' é obrigatório.");
+        }
+
+        Usuario usuario = repository.findByEmail(email.trim())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
         TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(tipoUsuarioId)
