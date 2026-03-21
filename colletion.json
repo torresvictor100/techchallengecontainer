@@ -2170,6 +2170,30 @@
       "item": [
         {
           "name": "Listar itens do cardápio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "if (Array.isArray(json) && json.length > 0) {",
+                  "  const praca = json.find(i => (i.nome || '').toLowerCase() === 'lasanha da praca');",
+                  "  const baiao = json.find(i => (i.nome || '').toLowerCase() === 'baiao de dois');",
+                  "",
+                  "  if (praca) pm.collectionVariables.set('itemCardapioId', praca.id);",
+                  "  if (baiao) pm.collectionVariables.set('itemCardapioId2', baiao.id);",
+                  "",
+                  "  if (!praca && json[0]) pm.collectionVariables.set('itemCardapioId', json[0].id);",
+                  "  if (!baiao && json[1]) pm.collectionVariables.set('itemCardapioId2', json[1].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -2225,6 +2249,134 @@
           "response": []
         },
         {
+          "name": "Criar item do cardápio - Falha (campos obrigatórios) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"descricao\": \"\",\n  \"preco\": -1,\n  \"somenteNoRestaurante\": null,\n  \"fotoPath\": \"\",\n  \"restauranteId\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar item do cardápio - Falha (restaurante inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Item Inexistente\",\n  \"descricao\": \"Descricao\",\n  \"preco\": 10.00,\n  \"somenteNoRestaurante\": true,\n  \"fotoPath\": \"/imagens/item.jpg\",\n  \"restauranteId\": {{restauranteIdErrado}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar item do cardápio - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Item Sem Token\",\n  \"descricao\": \"Descricao\",\n  \"preco\": 10.00,\n  \"somenteNoRestaurante\": true,\n  \"fotoPath\": \"/imagens/item.jpg\",\n  \"restauranteId\": {{restauranteId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Buscar item por ID",
           "request": {
             "method": "GET",
@@ -2244,6 +2396,43 @@
                 "api",
                 "itens-cardapio",
                 "{{itemCardapioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar item por ID - Falha (id inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioIdErrado}}"
               ]
             }
           },
@@ -2283,6 +2472,182 @@
           "response": []
         },
         {
+          "name": "Atualizar item do cardápio - Falha (campos inválidos) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"descricao\": \"\",\n  \"preco\": -10.00,\n  \"somenteNoRestaurante\": null,\n  \"fotoPath\": \"\",\n  \"restauranteId\": {{restauranteId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar item do cardápio - Falha (id inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Item Atualizado\",\n  \"descricao\": \"Descricao\",\n  \"preco\": 20.00,\n  \"somenteNoRestaurante\": true,\n  \"fotoPath\": \"/imagens/item-atualizado.jpg\",\n  \"restauranteId\": {{restauranteId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioIdErrado}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar item do cardápio - Falha (restaurante inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Item Atualizado\",\n  \"descricao\": \"Descricao\",\n  \"preco\": 20.00,\n  \"somenteNoRestaurante\": true,\n  \"fotoPath\": \"/imagens/item-atualizado.jpg\",\n  \"restauranteId\": {{restauranteIdErrado}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar item do cardápio - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Item Atualizado\",\n  \"descricao\": \"Descricao\",\n  \"preco\": 20.00,\n  \"somenteNoRestaurante\": true,\n  \"fotoPath\": \"/imagens/item-atualizado.jpg\",\n  \"restauranteId\": {{restauranteId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Deletar item do cardápio",
           "request": {
             "method": "DELETE",
@@ -2292,6 +2657,75 @@
                 "value": "Bearer {{accessToken}}"
               }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar item do cardápio - Falha (id inexistente) -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioIdErrado}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar item do cardápio - Falha (sem token) -> 401/403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 ou 403', function () {",
+                  "  pm.expect([401,403]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
               "host": [
@@ -2451,6 +2885,14 @@
     {
       "key": "itemCardapioId",
       "value": "2"
+    },
+    {
+      "key": "itemCardapioIdErrado",
+      "value": "999999"
+    },
+    {
+      "key": "itemCardapioId2",
+      "value": "3"
     }
   ]
 }

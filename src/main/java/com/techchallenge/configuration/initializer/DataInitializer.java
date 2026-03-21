@@ -1,5 +1,7 @@
 package com.techchallenge.configuration.initializer;
 
+import com.techchallenge.domain.cardapio.entity.ItemCardapio;
+import com.techchallenge.domain.cardapio.repository.ItemCardapioRepository;
 import com.techchallenge.domain.restaurante.entity.Restaurante;
 import com.techchallenge.domain.restaurante.repository.RestauranteRepository;
 import com.techchallenge.domain.tipousuario.entity.TipoUsuario;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Configuration
@@ -23,7 +26,8 @@ public class DataInitializer {
     public CommandLineRunner createDefaultUser(UsuarioRepository repository,
                                                PasswordEncoder encoder,
                                                TipoUsuarioRepository tipoUsuarioRepository,
-                                               RestauranteRepository restauranteRepository) {
+                                               RestauranteRepository restauranteRepository,
+                                               ItemCardapioRepository itemCardapioRepository) {
         return args -> {
 
             TipoUsuario donoRestaurante = criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Dono de Restaurante");
@@ -49,6 +53,23 @@ public class DataInitializer {
                     "Av. Recife, 500 - Recife",
                     "Nordestina",
                     "Seg-Sab 11:00-22:00");
+
+            Restaurante praca = restauranteRepository.findByNomeIgnoreCase("Cantina da Praca").orElse(null);
+            Restaurante nordestino = restauranteRepository.findByNomeIgnoreCase("Sabor Nordestino").orElse(null);
+
+            criarItemCardapioSeNaoExiste(itemCardapioRepository, praca,
+                    "Lasanha da Praca",
+                    "Lasanha com molho da casa",
+                    new BigDecimal("29.90"),
+                    true,
+                    "/imagens/lasanha-praca.jpg");
+
+            criarItemCardapioSeNaoExiste(itemCardapioRepository, nordestino,
+                    "Baiao de Dois",
+                    "Baiao de dois tradicional",
+                    new BigDecimal("24.90"),
+                    true,
+                    "/imagens/baiao-de-dois.jpg");
         };
     }
 
@@ -158,6 +179,63 @@ public class DataInitializer {
 
                     repository.save(novo);
                     System.out.println("✅ Restaurante criado: " + nome);
+                });
+    }
+
+    private void criarItemCardapioSeNaoExiste(ItemCardapioRepository repository, Restaurante restaurante,
+                                              String nome, String descricao, BigDecimal preco,
+                                              boolean somenteNoRestaurante, String fotoPath) {
+        if (restaurante == null) {
+            System.out.println("⚠ Restaurante não encontrado para criar item: " + nome);
+            return;
+        }
+
+        repository.findByNomeIgnoreCase(nome)
+                .ifPresentOrElse(item -> {
+                    boolean changed = false;
+
+                    if (item.getRestaurante() == null
+                            || !item.getRestaurante().getId().equals(restaurante.getId())) {
+                        item.setRestaurante(restaurante);
+                        changed = true;
+                    }
+                    if (!nome.equals(item.getNome())) {
+                        item.setNome(nome);
+                        changed = true;
+                    }
+                    if (!descricao.equals(item.getDescricao())) {
+                        item.setDescricao(descricao);
+                        changed = true;
+                    }
+                    if (item.getPreco() == null || item.getPreco().compareTo(preco) != 0) {
+                        item.setPreco(preco);
+                        changed = true;
+                    }
+                    if (item.getSomenteNoRestaurante() == null
+                            || item.getSomenteNoRestaurante() != somenteNoRestaurante) {
+                        item.setSomenteNoRestaurante(somenteNoRestaurante);
+                        changed = true;
+                    }
+                    if (!fotoPath.equals(item.getFotoPath())) {
+                        item.setFotoPath(fotoPath);
+                        changed = true;
+                    }
+
+                    if (changed) {
+                        repository.save(item);
+                        System.out.println("✅ Item atualizado: " + nome);
+                    }
+                }, () -> {
+                    ItemCardapio novo = new ItemCardapio();
+                    novo.setNome(nome);
+                    novo.setDescricao(descricao);
+                    novo.setPreco(preco);
+                    novo.setSomenteNoRestaurante(somenteNoRestaurante);
+                    novo.setFotoPath(fotoPath);
+                    novo.setRestaurante(restaurante);
+
+                    repository.save(novo);
+                    System.out.println("✅ Item criado: " + nome);
                 });
     }
 
