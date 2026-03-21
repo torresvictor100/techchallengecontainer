@@ -6,6 +6,7 @@ import com.techchallenge.domain.tipousuario.dto.TipoUsuarioUpdateDTO;
 import com.techchallenge.domain.tipousuario.entity.TipoUsuario;
 import com.techchallenge.domain.tipousuario.factory.TipoUsuarioFactory;
 import com.techchallenge.domain.tipousuario.repository.TipoUsuarioRepository;
+import com.techchallenge.domain.usuario.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +21,12 @@ public class TipoUsuarioService {
     private static final Logger log = LoggerFactory.getLogger(TipoUsuarioService.class);
 
     private final TipoUsuarioRepository repository;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
-    public TipoUsuarioService(TipoUsuarioRepository repository) {
+    public TipoUsuarioService(TipoUsuarioRepository repository, UsuarioRepository usuarioRepository) {
         this.repository = repository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<TipoUsuarioResponseDTO> listarTodos() {
@@ -79,6 +82,10 @@ public class TipoUsuarioService {
 
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Tipo de usuário não encontrado");
+        }
+
+        if (usuarioRepository.existsByTipoUsuarioId(id)) {
+            throw new IllegalArgumentException("Não é possível deletar tipo de usuário associado a usuários");
         }
 
         repository.deleteById(id);

@@ -971,6 +971,26 @@
       "item": [
         {
           "name": "Listar tipos de usuário",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "let json = pm.response.json();",
+                  "if (Array.isArray(json) && json.length > 0) {",
+                  "  const cliente = json.find(t => (t.nome || '').toLowerCase() === 'cliente');",
+                  "  const dono = json.find(t => (t.nome || '').toLowerCase() === 'dono de restaurante');",
+                  "  if (cliente) pm.collectionVariables.set('tipoUsuarioId', cliente.id);",
+                  "  if (dono) pm.collectionVariables.set('tipoUsuarioDonoId', dono.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -1555,6 +1575,43 @@
                 "api",
                 "tipos-usuario",
                 "{{tipoUsuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar tipo de usuário (Falha tipo associado) -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioDonoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioDonoId}}"
               ]
             }
           },

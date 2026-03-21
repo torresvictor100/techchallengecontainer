@@ -356,6 +356,18 @@ public class TipoUsuarioController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Tipo removido com sucesso"),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "Tipo associado a usuários",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Tipo em uso",
+                                    value = "{\n  \"status\": 400,\n  \"message\": \"Não é possível deletar tipo de usuário associado a usuários\"\n}"
+                            )
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "Tipo não encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))
