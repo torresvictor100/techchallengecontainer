@@ -1,5 +1,7 @@
 package com.techchallenge.configuration.initializer;
 
+import com.techchallenge.domain.tipousuario.entity.TipoUsuario;
+import com.techchallenge.domain.tipousuario.repository.TipoUsuarioRepository;
 import com.techchallenge.domain.usuario.entity.Usuario;
 import com.techchallenge.domain.usuario.entity.UsuarioRole;
 import com.techchallenge.domain.usuario.repository.UsuarioRepository;
@@ -16,8 +18,13 @@ import java.time.LocalDateTime;
 public class DataInitializer {
 
     @Bean
-    public CommandLineRunner createDefaultUser(UsuarioRepository repository, PasswordEncoder encoder) {
+    public CommandLineRunner createDefaultUser(UsuarioRepository repository,
+                                               PasswordEncoder encoder,
+                                               TipoUsuarioRepository tipoUsuarioRepository) {
         return args -> {
+
+            criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Cliente");
+            criarTipoUsuarioSeNaoExiste(tipoUsuarioRepository, "Dono de Restaurante");
 
             criarAdminComSha256(repository, encoder,
                     "admin2@tech.com", "123456");
@@ -25,6 +32,15 @@ public class DataInitializer {
             criarAdminSemSha256(repository, encoder,
                     "admin@tech.com", "123456");
         };
+    }
+
+    private TipoUsuario criarTipoUsuarioSeNaoExiste(TipoUsuarioRepository repository, String nome) {
+        return repository.findByNomeIgnoreCase(nome)
+                .orElseGet(() -> {
+                    TipoUsuario tipo = new TipoUsuario();
+                    tipo.setNome(nome);
+                    return repository.save(tipo);
+                });
     }
 
     private void criarAdminComSha256(UsuarioRepository repository, PasswordEncoder encoder,

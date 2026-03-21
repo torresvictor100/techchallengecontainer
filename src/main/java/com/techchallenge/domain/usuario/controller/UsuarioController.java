@@ -6,6 +6,7 @@ import com.techchallenge.domain.usuario.dto.UsuarioResponseDTO;
 import com.techchallenge.domain.usuario.dto.UsuarioUpdateDTO;
 import com.techchallenge.domain.usuario.dto.UsuarioUpdateRoleDTO;
 import com.techchallenge.domain.usuario.dto.UsuarioUpdateSenhaDTO;
+import com.techchallenge.domain.usuario.dto.UsuarioUpdateTipoDTO;
 import com.techchallenge.domain.usuario.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -349,6 +350,62 @@ public class UsuarioController {
         UsuarioResponseDTO atualizado = service.atualizarRole(dto);
 
         log.info("✅ Role atualizada com sucesso para usuário ID {}", dto.idUser());
+
+        return ResponseEntity.ok(atualizado);
+    }
+
+    @Operation(summary = "Atualizar tipo do usuário", description = "Associa um tipo de usuário a um usuário existente (somente ADMIN)")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tipo atualizado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário ou tipo não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso negado (somente ADMIN)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/tipo-usuario")
+    public ResponseEntity<UsuarioResponseDTO> atualizarTipoUsuario(
+            @Parameter(description = "ID do usuário", example = "2")
+            @PathVariable Long id,
+            @Valid
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Dados para atualizar tipo do usuário",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioUpdateTipoDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Request tipo",
+                                    value = "{\n  \"tipoUsuarioId\": 1\n}"
+                            )
+                    )
+            )
+            @RequestBody UsuarioUpdateTipoDTO dto) {
+
+        log.info("🧩 [PATCH] ADMIN solicitou atualização de tipo do usuário ID {}", id);
+
+        UsuarioResponseDTO atualizado = service.atualizarTipoUsuario(id, dto.tipoUsuarioId());
+
+        log.info("✅ Tipo atualizado com sucesso para usuário ID {}", id);
 
         return ResponseEntity.ok(atualizado);
     }

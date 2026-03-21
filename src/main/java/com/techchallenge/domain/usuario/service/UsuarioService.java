@@ -1,5 +1,7 @@
 package com.techchallenge.domain.usuario.service;
 
+import com.techchallenge.domain.tipousuario.entity.TipoUsuario;
+import com.techchallenge.domain.tipousuario.repository.TipoUsuarioRepository;
 import com.techchallenge.domain.usuario.exception.InvalidRoleException;
 import com.techchallenge.domain.usuario.dto.*;
 import com.techchallenge.domain.usuario.entity.Usuario;
@@ -24,10 +26,15 @@ public class UsuarioService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final TipoUsuarioRepository tipoUsuarioRepository;
+
     @Autowired
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository repository,
+                          PasswordEncoder passwordEncoder,
+                          TipoUsuarioRepository tipoUsuarioRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.tipoUsuarioRepository = tipoUsuarioRepository;
     }
 
     public List<UsuarioResponseDTO> listarTodos() {
@@ -106,6 +113,11 @@ public class UsuarioService {
         Usuario novo = UsuarioFactory.fromCreateDTO(dto);
         novo.setSenha(passwordEncoder.encode(dto.senha()));
 
+        TipoUsuario tipoUsuario = resolveTipoUsuario(dto.tipoUsuarioId());
+        if (tipoUsuario != null) {
+            novo.setTipoUsuario(tipoUsuario);
+        }
+
         Usuario salvo = repository.save(novo);
 
         log.info("✅ Usuário criado com sucesso! ID: {}, Email: {}", salvo.getId(), salvo.getEmail());
@@ -153,6 +165,24 @@ public class UsuarioService {
         return UsuarioFactory.toResponseDTO(atualizado);
     }
 
+    public UsuarioResponseDTO atualizarTipoUsuario(Long id, Long tipoUsuarioId) {
+
+        log.info("🔄 Atualizando tipo de usuário ID {} para tipo {}", id, tipoUsuarioId);
+
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(tipoUsuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de usuário não encontrado"));
+
+        usuario.setTipoUsuario(tipoUsuario);
+        usuario.setUltimaAtualizacao(java.time.LocalDateTime.now());
+
+        Usuario atualizado = repository.save(usuario);
+
+        return UsuarioFactory.toResponseDTO(atualizado);
+    }
+
     public void atualizarSenha(Long id, UsuarioUpdateSenhaDTO dto) {
 
         log.info("🔐 Atualizando senha do usuário ID {}", id);
@@ -190,5 +220,16 @@ public class UsuarioService {
         repository.deleteById(id);
 
         log.info("🗑✔ Usuário ID {} deletado com sucesso!", id);
+    }
+
+    private TipoUsuario resolveTipoUsuario(Long tipoUsuarioId) {
+        if (tipoUsuarioId != null) {
+            return tipoUsuarioRepository.findById(tipoUsuarioId)
+                    .orElseThrow(() -> new EntityNotFoundException("Tipo de usuário não encontrado"));
+        }
+
+        return tipoUsuarioRepository.findByNomeIgnoreCase("Cliente")
+                .or(() -> tipoUsuarioRepository.findByNomeIgnoreCase("CLIENT"))
+                .orElse(null);
     }
 }

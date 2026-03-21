@@ -1,5 +1,6 @@
 package com.techchallenge.domain.usuario.entity;
 
+import com.techchallenge.domain.tipousuario.entity.TipoUsuario;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,5 +29,9 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     private UsuarioRole role;
+
+    @ManyToOne
+    @JoinColumn(name = "tipo_usuario_id")
+    private TipoUsuario tipoUsuario;
 
 }

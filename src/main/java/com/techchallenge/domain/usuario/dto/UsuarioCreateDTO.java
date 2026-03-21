@@ -27,5 +27,8 @@ public record UsuarioCreateDTO(
         @Schema(description = "Endereço residencial do usuário", example = "Rua Centro, 123 - Recife, PE")
         @NotBlank(message = "Endereço é obrigatório")
         @NotNull
-        String endereco
+        String endereco,
+
+        @Schema(description = "ID do tipo de usuário", example = "1")
+        Long tipoUsuarioId
 ) {}

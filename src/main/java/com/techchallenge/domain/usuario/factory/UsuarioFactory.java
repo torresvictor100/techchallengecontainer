@@ -1,5 +1,7 @@
 package com.techchallenge.domain.usuario.factory;
 
+import com.techchallenge.domain.tipousuario.dto.TipoUsuarioResponseDTO;
+import com.techchallenge.domain.tipousuario.entity.TipoUsuario;
 import com.techchallenge.domain.usuario.dto.UsuarioCreateDTO;
 import com.techchallenge.domain.usuario.dto.UsuarioResponseDTO;
 import com.techchallenge.domain.usuario.dto.UsuarioUpdateDTO;
@@ -38,12 +40,19 @@ public class UsuarioFactory {
     }
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {
+        TipoUsuario tipo = usuario.getTipoUsuario();
+        TipoUsuarioResponseDTO tipoDto = null;
+        if (tipo != null) {
+            tipoDto = new TipoUsuarioResponseDTO(tipo.getId(), tipo.getNome());
+        }
+
         return new UsuarioResponseDTO(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getEndereco(),
                 usuario.getRole(),
+                tipoDto,
                 usuario.getUltimaAtualizacao()
         );
     }

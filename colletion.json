@@ -36,15 +36,27 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{loginPasswordHash}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "auth",
+                "login"
+              ]
             }
           },
           "response": []
@@ -78,15 +90,27 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{wrongLoginPasswordHash}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "auth",
+                "login"
+              ]
             }
           },
           "response": []
@@ -116,11 +140,23 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/v1/api/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "auth",
+                "me"
+              ]
             }
           },
           "response": []
@@ -164,15 +200,27 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nome\": \"{{novoNome}}\",\n  \"email\": \"{{novoEmail}}\",\n  \"senha\": \"{{novoUserSenhaHash}}\",\n  \"endereco\": \"Rua Centro, 123 - Recife, PE\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/registrar",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "registrar"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "registrar"
+              ]
             }
           },
           "response": []
@@ -193,15 +241,27 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nome\": \"Duplicado\",\n  \"email\": \"{{createdUserEmail}}\",\n  \"senha\": \"{{novoUserSenhaHash}}\",\n  \"endereco\": \"Rua Duplicada, 000\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/registrar",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "registrar"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "registrar"
+              ]
             }
           },
           "response": []
@@ -222,15 +282,27 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nome\": \"\",\n  \"email\": \"\",\n  \"senha\": \"\",\n  \"endereco\": \"\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/registrar",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "registrar"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "registrar"
+              ]
             }
           },
           "response": []
@@ -257,8 +329,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -266,8 +344,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{createdUserId}}"
+              ]
             }
           },
           "response": []
@@ -289,8 +374,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -298,13 +389,19 @@
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{createdUserId}}"
+              ]
             }
           },
           "response": []
         },
-
         {
           "name": "Alterar Senha - Sucesso (PATCH /{id}/senha) [HASH]",
           "event": [
@@ -322,8 +419,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -331,8 +434,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}/senha",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{createdUserId}}", "senha"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{createdUserId}}",
+                "senha"
+              ]
             }
           },
           "response": []
@@ -367,8 +478,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -376,13 +493,20 @@
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}/senha",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{createdUserId}}", "senha"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{createdUserId}}",
+                "senha"
+              ]
             }
           },
           "response": []
         },
-
         {
           "name": "Buscar Usuário por ID (GET /{id})",
           "event": [
@@ -403,16 +527,27 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{createdUserId}}"
+              ]
             }
           },
           "response": []
         },
-
         {
           "name": "Buscar Usuários por Nome - Sucesso (GET /buscar?nome=...)",
           "event": [
@@ -434,12 +569,29 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/buscar?nome={{createdUserNome}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "buscar"],
-              "query": [{ "key": "nome", "value": "{{createdUserNome}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "nome",
+                  "value": "{{createdUserNome}}"
+                }
+              ]
             }
           },
           "response": []
@@ -460,12 +612,29 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/buscar?nome=",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "buscar"],
-              "query": [{ "key": "nome", "value": "" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "nome",
+                  "value": ""
+                }
+              ]
             }
           },
           "response": []
@@ -489,14 +658,25 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/buscar?nome={{createdUserNome}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "buscar"],
-              "query": [{ "key": "nome", "value": "{{createdUserNome}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "nome",
+                  "value": "{{createdUserNome}}"
+                }
+              ]
             }
           },
           "response": []
         },
-
         {
           "name": "Atualizar Role - Sucesso (PATCH /role) [ADMIN]",
           "event": [
@@ -519,8 +699,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -528,8 +714,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/role",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "role"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "role"
+              ]
             }
           },
           "response": []
@@ -551,8 +744,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -560,8 +759,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/role",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "role"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "role"
+              ]
             }
           },
           "response": []
@@ -583,8 +789,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -592,8 +804,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/role",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "role"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "role"
+              ]
             }
           },
           "response": []
@@ -614,20 +833,31 @@
           ],
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"idUser\": \"{{createdUserId}}\",\n  \"role\": \"CLIENT\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/role",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "role"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "role"
+              ]
             }
           },
           "response": []
         },
-
         {
           "name": "Deletar Usuário - Sucesso (DELETE /{id})",
           "event": [
@@ -644,11 +874,23 @@
           ],
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{createdUserId}}"
+              ]
             }
           },
           "response": []
@@ -669,11 +911,23 @@
           ],
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{nonexistentUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{nonexistentUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{nonexistentUserId}}"
+              ]
             }
           },
           "response": []
@@ -697,8 +951,660 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/v1/api/usuarios/{{createdUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "api", "usuarios", "{{createdUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "usuarios",
+                "{{createdUserId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Tipos de Usuário",
+      "item": [
+        {
+          "name": "Listar tipos de usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar tipo de usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"NovoTipo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Falha tipo de usuário (nome duplicado)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Cliente\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Falha tipo de usuário (campos obrigatórios faltando)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar tipo por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar tipo por ID(FALHA id errado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioIdErrado}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar tipo de usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"ClienteAtualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar tipo de usuário (FALHA falta de nome)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar tipo de usuário (FALHA falta id errado )",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Dono\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioIdErrado}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar tipo de usuário (falha duplicado nome)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Dono de Restaurante\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar tipo de usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar tipo de usuário(Falha id errado)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioIdErrado}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "tipos-usuario",
+                "{{tipoUsuarioIdErrado}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Restaurantes",
+      "item": [
+        {
+          "name": "Listar restaurantes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar restaurante",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Cantina da Praça\",\n  \"endereco\": \"Rua Central, 100\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": {{createdUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar restaurante por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar restaurante",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Cantina Atualizada\",\n  \"endereco\": \"Av. Nova, 200\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Sex 10:00-22:00\",\n  \"donoId\": {{createdUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar restaurante",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "restaurantes",
+                "{{restauranteId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Itens do Cardápio",
+      "item": [
+        {
+          "name": "Listar itens do cardápio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar item do cardápio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Lasanha\",\n  \"descricao\": \"Lasanha à bolonhesa\",\n  \"preco\": 29.90,\n  \"somenteNoRestaurante\": true,\n  \"fotoPath\": \"/imagens/lasanha.jpg\",\n  \"restauranteId\": {{restauranteId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar item por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar item do cardápio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Lasanha Especial\",\n  \"descricao\": \"Lasanha com molho artesanal\",\n  \"preco\": 34.90,\n  \"somenteNoRestaurante\": false,\n  \"fotoPath\": \"/imagens/lasanha-especial.jpg\",\n  \"restauranteId\": {{restauranteId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar item do cardápio",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api",
+                "itens-cardapio",
+                "{{itemCardapioId}}"
+              ]
             }
           },
           "response": []
@@ -744,26 +1650,85 @@
     }
   ],
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080" },
-    { "key": "accessToken", "value": "" },
-    { "key": "refreshToken", "value": "" },
-
-    { "key": "loginEmail", "value": "admin2@tech.com" },
-    { "key": "loginPassword", "value": "123456" },
-    { "key": "loginPasswordHash", "value": "" },
-
-    { "key": "createdUserId", "value": "" },
-    { "key": "createdUserEmail", "value": "" },
-    { "key": "createdUserNome", "value": "" },
-
-    { "key": "novoUserSenhaPlain", "value": "123456" },
-    { "key": "novoUserSenhaHash", "value": "" },
-
-    { "key": "senhaAtualPlain", "value": "123456" },
-    { "key": "novaSenhaPlain", "value": "NovaSenha@123" },
-    { "key": "senhaAtualHash", "value": "" },
-    { "key": "novaSenhaHash", "value": "" },
-
-    { "key": "nonexistentUserId", "value": "999999999" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "loginEmail",
+      "value": "admin2@tech.com"
+    },
+    {
+      "key": "loginPassword",
+      "value": "123456"
+    },
+    {
+      "key": "loginPasswordHash",
+      "value": ""
+    },
+    {
+      "key": "createdUserId",
+      "value": ""
+    },
+    {
+      "key": "createdUserEmail",
+      "value": ""
+    },
+    {
+      "key": "createdUserNome",
+      "value": ""
+    },
+    {
+      "key": "novoUserSenhaPlain",
+      "value": "123456"
+    },
+    {
+      "key": "novoUserSenhaHash",
+      "value": ""
+    },
+    {
+      "key": "senhaAtualPlain",
+      "value": "123456"
+    },
+    {
+      "key": "novaSenhaPlain",
+      "value": "NovaSenha@123"
+    },
+    {
+      "key": "senhaAtualHash",
+      "value": ""
+    },
+    {
+      "key": "novaSenhaHash",
+      "value": ""
+    },
+    {
+      "key": "nonexistentUserId",
+      "value": "999999999"
+    },
+    {
+      "key": "tipoUsuarioIdErrado",
+      "value": "1424242"
+    },
+    {
+      "key": "tipoUsuarioId",
+      "value": "3"
+    },
+    {
+      "key": "restauranteId",
+      "value": "2"
+    },
+    {
+      "key": "itemCardapioId",
+      "value": "2"
+    }
   ]
 }

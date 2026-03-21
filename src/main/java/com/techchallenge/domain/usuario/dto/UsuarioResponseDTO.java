@@ -1,5 +1,6 @@
 package com.techchallenge.domain.usuario.dto;
 
+import com.techchallenge.domain.tipousuario.dto.TipoUsuarioResponseDTO;
 import com.techchallenge.domain.usuario.entity.UsuarioRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,6 +23,9 @@ public record UsuarioResponseDTO(
 
         @Schema(description = "Perfil do usuário", example = "CLIENT")
         UsuarioRole role,
+
+        @Schema(description = "Tipo de usuário associado")
+        TipoUsuarioResponseDTO tipoUsuario,
 
         @Schema(description = "Data da última atualização")
         LocalDateTime ultimaAtualizacao
