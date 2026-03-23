@@ -63,6 +63,11 @@ Backend em Spring Boot 3.5 (Java 21) com MySQL 8 e Docker Compose. Este guia tra
    docker compose ps
    ```
 
+## Como rodar os testes
+1. Execute `./gradlew test` (ou `gradlew.bat test` no Windows) para acionar todas as suítes JUnit/Spring Boot com o Gradle Wrapper fornecido pelo projeto.
+2. Para garantir que nada do build anterior interfira, rode `./gradlew clean test`.
+3. Os testes utilizam o H2 em memória definido em `src/test/resources`, então o MySQL do Docker Compose não é necessário para verificá-los.
+
 ## Acessos úteis
 - API base: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
