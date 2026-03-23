@@ -1268,7 +1268,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/api/tipos-usuario/usuarios?tipoNome={{tipoUsuarioNome}}",
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/usuarios?tipoNome=Dono de Restaurante",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1281,7 +1281,7 @@
               "query": [
                 {
                   "key": "tipoNome",
-                  "value": "{{tipoUsuarioNome}}"
+                  "value": "Dono de Restaurante"
                 }
               ]
             }
@@ -1359,7 +1359,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{createdUserEmail}}\",\n  \"tipoUsuarioId\": {{tipoUsuarioId}}\n}"
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"tipoUsuarioId\": {{tipoUsuarioId}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/tipos-usuario/usuarios/tipo",
@@ -1566,7 +1566,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/api/tipos-usuario/{{tipoUsuarioId}}",
+              "raw": "{{baseUrl}}/v1/api/tipos-usuario/3",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1574,7 +1574,7 @@
                 "v1",
                 "api",
                 "tipos-usuario",
-                "{{tipoUsuarioId}}"
+                "3"
               ]
             }
           },
@@ -1711,7 +1711,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Cantina da Praça\",\n  \"endereco\": \"Rua Central, 100\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": {{createdUserId}}\n}"
+              "raw": "{\n  \"nome\": \"Cantina da Praça\",\n  \"endereco\": \"Rua Central, 100\",\n  \"tipoCozinha\": \"Italiana\",\n  \"horarioFuncionamento\": \"Seg-Dom 11:00-23:00\",\n  \"donoId\": 2\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/api/restaurantes",
@@ -1933,10 +1933,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Cantina Atualizada\",\n  \"endereco\": \"Av. Nova, 200\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Sex 10:00-22:00\",\n  \"donoId\": {{createdUserId}}\n}"
+              "raw": "{\n  \"nome\": \"Cantina Atualizada\",\n  \"endereco\": \"Av. Nova, 200\",\n  \"tipoCozinha\": \"Brasileira\",\n  \"horarioFuncionamento\": \"Seg-Sex 10:00-22:00\",\n  \"donoId\": 1\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "raw": "{{baseUrl}}/v1/api/restaurantes/2",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1944,7 +1944,7 @@
                 "v1",
                 "api",
                 "restaurantes",
-                "{{restauranteId}}"
+                "2"
               ]
             }
           },
@@ -2137,7 +2137,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/api/restaurantes/{{restauranteId}}",
+              "raw": "{{baseUrl}}/v1/api/restaurantes/3",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2145,7 +2145,7 @@
                 "v1",
                 "api",
                 "restaurantes",
-                "{{restauranteId}}"
+                "3"
               ]
             }
           },
@@ -2715,7 +2715,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/api/itens-cardapio/{{itemCardapioId}}",
+              "raw": "{{baseUrl}}/v1/api/itens-cardapio/3",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2723,7 +2723,7 @@
                 "v1",
                 "api",
                 "itens-cardapio",
-                "{{itemCardapioId}}"
+                "3"
               ]
             }
           },
@@ -2869,7 +2869,7 @@
     },
     {
       "key": "createdUserEmail",
-      "value": ""
+      "value": "admin2@tech.com"
     },
     {
       "key": "createdUserNome",
